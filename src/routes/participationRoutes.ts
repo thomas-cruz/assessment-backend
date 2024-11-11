@@ -1,9 +1,9 @@
-// src/routes/participationRoutes.ts
 import { Router } from "express";
 import {
   createParticipation,
   getParticipationById,
   getAllParticipationsByUserName,
+  getAllParticipations,
   updateParticipation,
   deleteParticipation,
 } from "../controllers/participationController";
@@ -11,6 +11,7 @@ import {
 const router = Router();
 
 router.post("/", createParticipation);
+router.get("/", getAllParticipations);
 router.get("/user", getAllParticipationsByUserName);
 router.get("/:id", getParticipationById);
 router.put("/:id", updateParticipation);

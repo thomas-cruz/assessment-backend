@@ -14,7 +14,7 @@ const client_1 = require("@prisma/client");
 const participation_1 = require("../schema/participation");
 const prisma = new client_1.PrismaClient();
 class ParticipationService {
-    getParticipationById(res, id) {
+    getParticipationById(req, res, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const participation = yield prisma.participation.findUnique({
@@ -29,11 +29,18 @@ class ParticipationService {
                 });
             }
             catch (error) {
+                console.error({ error });
                 if (error) {
-                    return res.status(400).send({ message: error.message });
+                    return res.send({
+                        message: error.message,
+                        status: 400
+                    });
                 }
                 else {
-                    return res.status(500).send({ message: "Internal Server Error" });
+                    return res.send({
+                        message: "Internal Server Error",
+                        status: 500
+                    });
                 }
             }
         });
@@ -59,7 +66,7 @@ class ParticipationService {
             }
         });
     }
-    getAllParticipationsByUserName(res, data) {
+    getAllParticipationsByUserName(req, res, data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const participations = yield prisma.participation.findMany({
@@ -70,27 +77,74 @@ class ParticipationService {
                     orderBy: { percentage: "desc" },
                 });
                 return res.send({
-                    message: "Successfully retrived a participations",
+                    message: "Successfully retrived participations by user names",
                     data: participations,
                 });
             }
             catch (error) {
+                console.error({ error });
                 if (error) {
-                    return res.status(400).send({ message: error.message });
+                    return res.send({
+                        message: error.message,
+                        status: 400
+                    });
                 }
                 else {
-                    return res.status(500).send({ message: "Internal Server Error" });
+                    return res.send({
+                        message: "Internal Server Error",
+                        status: 500
+                    });
                 }
             }
         });
     }
-    createParticipation(res, data) {
+    getAllParticipations(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                (0, participation_1.validateParticipation)(data);
+                const participations = yield prisma.participation.findMany({
+                    orderBy: { percentage: "desc" },
+                });
+                console.log('hello world', { participations });
+                return res.send({
+                    message: "Successfully retrived participations",
+                    data: participations,
+                });
             }
             catch (error) {
-                return res.status(400).send({ message: error.message });
+                console.error({ error });
+                if (error) {
+                    return res.send({
+                        message: error.message,
+                        status: 400
+                    });
+                }
+                else {
+                    return res.send({
+                        message: "Internal Server Error",
+                        status: 500
+                    });
+                }
+            }
+        });
+    }
+    createParticipation(req, res, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield (0, participation_1.validateParticipation)(data);
+            }
+            catch (error) {
+                if (error) {
+                    return res.send({
+                        message: error.message,
+                        status: 400
+                    });
+                }
+                else {
+                    return res.send({
+                        message: "Internal Server Error",
+                        status: 500
+                    });
+                }
             }
             const existingParticipations = yield this.getParticipationsByUserName({
                 firstName: data.firstName,
@@ -112,23 +166,42 @@ class ParticipationService {
                 });
             }
             catch (error) {
+                console.error({ error });
                 if (error) {
-                    return res.status(400).send({ message: error.message });
+                    return res.send({
+                        message: error.message,
+                        status: 400
+                    });
                 }
                 else {
-                    return res.status(500).send({ message: "Internal Server Error" });
+                    return res.send({
+                        message: "Internal Server Error",
+                        status: 500
+                    });
                 }
             }
         });
     }
-    updateParticipation(res, id, data) {
+    updateParticipation(req, res, id, data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 try {
-                    (0, participation_1.validateParticipation)(data);
+                    yield (0, participation_1.validateParticipation)(data);
                 }
                 catch (error) {
-                    return res.status(400).send({ message: error.message });
+                    console.error({ error });
+                    if (error) {
+                        return res.send({
+                            message: error.message,
+                            status: 400
+                        });
+                    }
+                    else {
+                        return res.send({
+                            message: "Internal Server Error",
+                            status: 500
+                        });
+                    }
                 }
                 const existingParticipations = yield this.getParticipationsByUserName({
                     firstName: data.firstName,
@@ -154,16 +227,23 @@ class ParticipationService {
                 });
             }
             catch (error) {
+                console.error({ error });
                 if (error) {
-                    return res.status(400).send({ message: error.message });
+                    return res.send({
+                        message: error.message,
+                        status: 400
+                    });
                 }
                 else {
-                    return res.status(500).send({ message: "Internal Server Error" });
+                    return res.send({
+                        message: "Internal Server Error",
+                        status: 500
+                    });
                 }
             }
         });
     }
-    deleteParticipation(res, id) {
+    deleteParticipation(req, res, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const deleted = yield prisma.participation.delete({
@@ -177,11 +257,18 @@ class ParticipationService {
                     .send({ message: "Successfully delete participation." });
             }
             catch (error) {
+                console.error({ error });
                 if (error) {
-                    return res.status(400).send({ message: error.message });
+                    return res.send({
+                        message: error.message,
+                        status: 400
+                    });
                 }
                 else {
-                    return res.status(500).send({ message: "Internal Server Error" });
+                    return res.send({
+                        message: "Internal Server Error",
+                        status: 500
+                    });
                 }
             }
         });

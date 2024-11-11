@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteParticipation = exports.updateParticipation = exports.getParticipationById = exports.getAllParticipationsByUserName = exports.createParticipation = void 0;
+exports.deleteParticipation = exports.updateParticipation = exports.getParticipationById = exports.getAllParticipations = exports.getAllParticipationsByUserName = exports.createParticipation = void 0;
 const participationService_1 = require("../services/participationService");
 const participationService = new participationService_1.ParticipationService();
 const createParticipation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstName, lastName, percentage } = req.body;
-    return yield participationService.createParticipation(res, {
+    return yield participationService.createParticipation(req, res, {
         firstName,
         lastName,
         percentage,
@@ -22,20 +22,24 @@ const createParticipation = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 exports.createParticipation = createParticipation;
 const getAllParticipationsByUserName = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { firstName, lastName } = req.body;
-    return yield participationService.getAllParticipationsByUserName(res, {
+    const { firstName, lastName } = req.params;
+    return yield participationService.getAllParticipationsByUserName(req, res, {
         firstName,
         lastName,
     });
 });
 exports.getAllParticipationsByUserName = getAllParticipationsByUserName;
+const getAllParticipations = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield participationService.getAllParticipations(req, res);
+});
+exports.getAllParticipations = getAllParticipations;
 const getParticipationById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield participationService.getParticipationById(res, req.params.id);
+    return yield participationService.getParticipationById(req, res, req.params.id);
 });
 exports.getParticipationById = getParticipationById;
 const updateParticipation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstName, lastName, percentage } = req.body;
-    return yield participationService.updateParticipation(res, req.params.id, {
+    return yield participationService.updateParticipation(req, res, req.params.id, {
         firstName,
         lastName,
         percentage,
@@ -43,6 +47,6 @@ const updateParticipation = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 exports.updateParticipation = updateParticipation;
 const deleteParticipation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield participationService.deleteParticipation(res, req.params.id);
+    return yield participationService.deleteParticipation(req, res, req.params.id);
 });
 exports.deleteParticipation = deleteParticipation;

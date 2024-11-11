@@ -15,15 +15,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectToDatabase = void 0;
 const express_1 = __importDefault(require("express"));
 require("express-async-errors");
-const errorMiddleware_1 = require("./middlewares/errorMiddleware");
 const participationRoutes_1 = __importDefault(require("./routes/participationRoutes"));
 const client_1 = require("@prisma/client");
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
-const prisma = new client_1.PrismaClient(); //initialize prisma
+const prisma = new client_1.PrismaClient();
+app.use((0, cors_1.default)({
+    origin: '*',
+    credentials: true
+}));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use("/api/participation", participationRoutes_1.default);
-app.use(errorMiddleware_1.errorHandler);
 const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield prisma.$connect();
@@ -35,7 +38,4 @@ const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.connectToDatabase = connectToDatabase;
-app.use((err, res) => {
-    res.status(500).json({ message: "Internal Server Error" });
-});
 exports.default = app;

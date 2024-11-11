@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { validateParticipation } from "../schema/participation";
-import { Response } from "express";
+import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
 export class ParticipationService {
-  async getParticipationById(res: Response, id: string) {
+  async getParticipationById(req: Request, res: Response, id: string) {
     try {
       const participation = await prisma.participation.findUnique({
         where: { id: parseInt(id) },
@@ -19,10 +19,17 @@ export class ParticipationService {
         data: participation,
       });
     } catch (error: any) {
+      console.error({error})
       if (error) {
-        return res.status(400).send({ message: error.message });
+        return res.send({
+          message: error.message,
+          status: 400
+        });
       } else {
-        return res.status(500).send({ message: "Internal Server Error" });
+        return res.send({
+          message: "Internal Server Error",
+          status: 500
+        });
       }
     }
   }
@@ -49,6 +56,7 @@ export class ParticipationService {
   }
 
   async getAllParticipationsByUserName(
+    req: Request, 
     res: Response,
     data: { firstName: string; lastName: string }
   ) {
@@ -62,19 +70,53 @@ export class ParticipationService {
       });
 
       return res.send({
-        message: "Successfully retrived a participations",
+        message: "Successfully retrived participations by user names",
         data: participations,
       });
     } catch (error: any) {
+      console.error({error})
       if (error) {
-        return res.status(400).send({ message: error.message });
+        return res.send({
+          message: error.message,
+          status: 400
+        });
       } else {
-        return res.status(500).send({ message: "Internal Server Error" });
+        return res.send({
+          message: "Internal Server Error",
+          status: 500
+        });
+      }
+    }
+  }
+
+  async getAllParticipations(req: Request, res: Response) {
+    try {
+      const participations = await prisma.participation.findMany({
+        orderBy: { percentage: "desc" },
+      });
+      console.log('hello world', {participations})
+      return res.send({
+        message: "Successfully retrived participations",
+        data: participations,
+      });
+    } catch (error: any) {
+      console.error({error})
+      if (error) {
+        return res.send({
+          message: error.message,
+          status: 400
+        });
+      } else {
+        return res.send({
+          message: "Internal Server Error",
+          status: 500
+        });
       }
     }
   }
 
   async createParticipation(
+    req: Request, 
     res: Response,
     data: {
       firstName: string;
@@ -83,9 +125,19 @@ export class ParticipationService {
     }
   ) {
     try {
-      validateParticipation(data);
+      await validateParticipation(data);
     } catch (error: any) {
-      return res.status(400).send({ message: error.message });
+      if (error) {
+        return res.send({
+          message: error.message,
+          status: 400
+        });
+      } else {
+        return res.send({
+          message: "Internal Server Error",
+          status: 500
+        });
+      }
     }
 
     const existingParticipations = await this.getParticipationsByUserName({
@@ -112,15 +164,23 @@ export class ParticipationService {
         data: participation,
       });
     } catch (error: any) {
+      console.error({error})
       if (error) {
-        return res.status(400).send({ message: error.message });
+        return res.send({
+          message: error.message,
+          status: 400
+        });
       } else {
-        return res.status(500).send({ message: "Internal Server Error" });
+        return res.send({
+          message: "Internal Server Error",
+          status: 500
+        });
       }
     }
   }
 
   async updateParticipation(
+    req: Request, 
     res: Response,
     id: string,
     data: {
@@ -131,10 +191,21 @@ export class ParticipationService {
   ) {
     try {
       try {
-				validateParticipation(data);
-			} catch (error: any) {
-				return res.status(400).send({ message: error.message });
-			}
+        await validateParticipation(data);
+      } catch (error: any) {
+        console.error({error})
+        if (error) {
+          return res.send({
+            message: error.message,
+            status: 400
+          });
+        } else {
+          return res.send({
+            message: "Internal Server Error",
+            status: 500
+          });
+        }
+      }
 
       const existingParticipations = await this.getParticipationsByUserName({
         firstName: data.firstName,
@@ -165,15 +236,22 @@ export class ParticipationService {
         data: updatedParticipation,
       });
     } catch (error: any) {
+      console.error({error})
       if (error) {
-        return res.status(400).send({ message: error.message });
+        return res.send({
+          message: error.message,
+          status: 400
+        });
       } else {
-        return res.status(500).send({ message: "Internal Server Error" });
+        return res.send({
+          message: "Internal Server Error",
+          status: 500
+        });
       }
     }
   }
 
-  async deleteParticipation(res: Response, id: string) {
+  async deleteParticipation(req: Request, res: Response, id: string) {
     try {
       const deleted = await prisma.participation.delete({
         where: { id: parseInt(id) },
@@ -185,10 +263,17 @@ export class ParticipationService {
         .status(204)
         .send({ message: "Successfully delete participation." });
     } catch (error: any) {
+      console.error({error})
       if (error) {
-        return res.status(400).send({ message: error.message });
+        return res.send({
+          message: error.message,
+          status: 400
+        });
       } else {
-        return res.status(500).send({ message: "Internal Server Error" });
+        return res.send({
+          message: "Internal Server Error",
+          status: 500
+        });
       }
     }
   }
